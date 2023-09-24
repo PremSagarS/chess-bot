@@ -173,6 +173,43 @@ class ChessGameState:
         self.draw_move_counter = draw
         self.move_counter = move_no
 
+    def board_to_fen(self):
+        op = ""
+        buffer = 0
+        for i in range(64):
+            cur = self.chessboard[i]
+            if cur == 0:
+                buffer += 1
+            else:
+                if buffer != 0:
+                    op += str(buffer)
+                    buffer = 0
+                op += PIECE_TO_TEXT[cur]
+            if (i + 1) % 8 == 0 and i != 63:
+                if buffer != 0:
+                    op += str(buffer)
+                    buffer = 0
+                op += "/"
+        if self.to_move == WHITE:
+            op += " w"
+        else:
+            op += " b"
+        op += " "
+        casrightsalpha = ["K", "Q", "k", "q"]
+        if self.castling_rights == [False] * 4:
+            op += "-"
+        else:
+            for i in range(4):
+                if self.castling_rights[i]:
+                    op += casrightsalpha[i]
+        if self.en_passant_square == None:
+            op += " -"
+        else:
+            op += " " + idx_to_square(self.en_passant_square)
+        op += " " + str(self.draw_move_counter)
+        op += " " + str(self.move_counter)
+        return op
+
     def print_board(self):
         print("-" * 17)
         for rank in range(8):
@@ -205,4 +242,4 @@ c = ChessGameState()
 c.print_board()
 c.set_to_fen("rnbqkbnr/p1pp1ppp/4p3/1p1P4/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")
 c.print_board()
-print(c.generate_pseudo_legal_moves_for(square_to_idx("d5")))
+print(c.board_to_fen())

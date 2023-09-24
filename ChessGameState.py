@@ -1,35 +1,5 @@
-EMPTY = 0b00000
-WHITE = 0b01000
-BLACK = 0b10000
-PAWN = 0b00001
-KNIGHT = 0b00010
-BISHOP = 0b00011
-ROOK = 0b00100
-QUEEN = 0b00101
-KING = 0b00110
-
-PIECE_TO_TEXT = {
-    EMPTY: " ",
-    BLACK | ROOK: "r",
-    BLACK | KNIGHT: "n",
-    BLACK | BISHOP: "b",
-    BLACK | QUEEN: "q",
-    BLACK | KING: "k",
-    BLACK | PAWN: "p",
-    WHITE | ROOK: "R",
-    WHITE | KNIGHT: "N",
-    WHITE | BISHOP: "B",
-    WHITE | QUEEN: "Q",
-    WHITE | KING: "K",
-    WHITE | PAWN: "P",
-}
-
-TEXT_TO_PIECE = {v: k for k, v in PIECE_TO_TEXT.items()}
-
-FILES_TO_IDX = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
-RANKS_TO_IDX = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}
-IDX_TO_FILES = {v: k for k, v in FILES_TO_IDX.items()}
-IDX_TO_RANKS = {v: k for k, v in RANKS_TO_IDX.items()}
+from Move import Move
+from ChessConstants import *
 
 
 class ChessGameState:
@@ -46,16 +16,59 @@ class ChessGameState:
         for i in range(23):
             self.pieces.append([])
         self.gen_pieces()
+        self.numsquarestoedge = []
+        for i in range(64):
+            self.numsquarestoedge.append([])
+        self.precomputemovedata()
 
-    def square_to_idx(square):
-        file = FILES_TO_IDX[square[0]]
-        rank = RANKS_TO_IDX[square[1]]
-        return rank * 8 + file
+    def precomputemovedata(self):
+        for rank in range(8):
+            for file in range(8):
+                northMax = rank
+                southMax = 7 - rank
+                eastMax = 7 - file
+                westMax = file
 
-    def idx_to_square(idx):
-        file_idx = idx % 8
-        rank_idx = idx // 8
-        return IDX_TO_FILES[file_idx] + IDX_TO_RANKS[rank_idx]
+                square = rank * 8 + file
+
+                self.numsquarestoedge[square] = [
+                    northMax,
+                    southMax,
+                    eastMax,
+                    westMax,
+                    min(northMax, eastMax),
+                    min(northMax, westMax),
+                    min(southMax, eastMax),
+                    min(southMax, westMax),
+                ]
+
+    def generate_pseudo_legal_moves_for(self, start_square_idx):
+        startSquarePiece = self.chessboard[start_square_idx]
+        startSquarePieceType = startSquarePiece & 0b00111
+        startSquarePieceColor = startSquarePiece & 0b11000
+        if startSquarePieceColor != self.to_move:
+            return []
+
+        possibleMoves = []
+
+        for directionIndex in range(8):
+            for n in range(
+                1, self.numsquarestoedge[start_square_idx][directionIndex] + 1
+            ):
+                end_square_idx = start_square_idx + DIRECTIONOFFSETS[directionIndex] * n
+                endSquarePiece = self.chessboard[end_square_idx]
+                endSquareColor = endSquarePiece & 0b11000
+                if endSquarePiece == EMPTY:
+                    possibleMoves.append(
+                        Move(start_square_idx, end_square_idx, startSquarePiece)
+                    )
+                elif endSquareColor == self.to_move:
+                    break
+                else:
+                    possibleMoves.append(
+                        Move(start_square_idx, end_square_idx, startSquarePiece)
+                    )
+        return possibleMoves
 
     def set_to_fen(self, fen):
         position, to_move, castling, passant, draw, move_no = fen.split(" ")
@@ -83,7 +96,7 @@ class ChessGameState:
         if passant == "-":
             self.en_passant_square = None
         else:
-            self.en_passant_square = ChessGameState.square_to_idx(passant)
+            self.en_passant_square = square_to_idx(passant)
         self.draw_move_counter = draw
         self.move_counter = move_no
 
@@ -103,7 +116,7 @@ class ChessGameState:
             print("Black to move")
         if self.en_passant_square:
             print(
-                f"En passant available on square {ChessGameState.idx_to_square(self.en_passant_square)}"
+                f"En passant available on square {idx_to_square(self.en_passant_square)}"
             )
         print(f"Castling details: {self.castling_rights}")
         print(f"Number of moves with no development: {self.draw_move_counter}")
@@ -117,5 +130,6 @@ class ChessGameState:
 
 c = ChessGameState()
 c.print_board()
-c.set_to_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2")
+c.set_to_fen("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 c.print_board()
+print(c.generate_pseudo_legal_moves_for(square_to_idx("d1")))

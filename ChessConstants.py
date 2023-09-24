@@ -44,3 +44,8 @@ def idx_to_square(idx):
     file_idx = idx % 8
     rank_idx = idx // 8
     return IDX_TO_FILES[file_idx] + IDX_TO_RANKS[rank_idx]
+
+
+PAWN_MOVES_DIRECTION_OFFSET = {WHITE: -8, BLACK: 8}
+PAWN_TAKES_DIRECTION_OFFSET = {WHITE: [-9, -7], BLACK: [7, 9]}
+PAWN_START_RANK = {WHITE: 6, BLACK: 1}

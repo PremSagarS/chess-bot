@@ -1,5 +1,6 @@
 from Move import Move
 from ChessConstants import *
+from chessboard import display
 
 
 class ChessGameState:
@@ -232,6 +233,12 @@ class ChessGameState:
         print(f"Number of moves with no development: {self.draw_move_counter}")
         print(f"Move number: {self.move_counter}")
 
+    def display_board(self, fen):
+        game_board = display.start()
+        while True:
+            display.check_for_quit()
+            display.update(fen, game_board)
+
     def gen_pieces(self):
         for i in range(64):
             piece = self.chessboard[i]
@@ -241,5 +248,5 @@ class ChessGameState:
 c = ChessGameState()
 c.print_board()
 c.set_to_fen("rnbqkbnr/p1pp1ppp/4p3/1p1P4/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")
-c.print_board()
+c.display_board(c.board_to_fen())
 print(c.board_to_fen())

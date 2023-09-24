@@ -42,12 +42,25 @@ class ChessGameState:
         startSquarePiece = self.chessboard[start_square_idx]
         startSquarePieceType = startSquarePiece & 0b00111
         startSquarePieceColor = startSquarePiece & 0b11000
-        if startSquarePieceColor != self.to_move:
+        if startSquarePieceColor != self.to_move or startSquarePiece == EMPTY:
             return []
 
         possibleMoves = []
 
         directionIndexStart = directionIndexEnd = None
+
+        if startSquarePieceType == KNIGHT:
+            for offset_idx in range(8):
+                end_square_idx = start_square_idx + KNIGHT_OFFSETS[offset_idx]
+                if end_square_idx < 0 or end_square_idx > 63:
+                    continue
+                endSquarePiece = self.chessboard[end_square_idx]
+                endSquarePieceColor = endSquarePiece & 0b11000
+                if endSquarePiece == EMPTY or endSquarePieceColor != self.to_move:
+                    possibleMoves.append(
+                        Move(start_square_idx, end_square_idx, startSquarePiece)
+                    )
+            return possibleMoves
 
         if startSquarePieceType == PAWN:
             # Normal forward pushes
@@ -199,6 +212,15 @@ class ChessGameState:
                     )
         return possibleMoves
 
+    def generate_pseudo_legal_moves(self):
+        possible_moves = []
+        for square_indices in self.pieces[1:]:
+            for square_index in square_indices:
+                possible_moves.extend(
+                    self.generate_pseudo_legal_moves_for(square_index)
+                )
+        return possible_moves
+
     def set_to_fen(self, fen):
         position, to_move, castling, passant, draw, move_no = fen.split(" ")
         index = 0
@@ -303,6 +325,4 @@ class ChessGameState:
 
 
 c = ChessGameState()
-c.set_to_fen("r2qkb1r/1P1npppp/p4n2/3p1b2/5B2/2P5/PP1NPPPP/R2QKBNR w KQkq - 1 8")
-print(c.generate_pseudo_legal_moves_for(square_to_idx("b7")))
-print(c.pieces)
+print(len(c.generate_pseudo_legal_moves()))

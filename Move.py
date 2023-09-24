@@ -3,7 +3,7 @@ from ChessConstants import *
 
 class Move:
     def __init__(
-        self, start_square, end_square, piece, promoteTo=None, castle=4
+        self, start_square, end_square, piece, promoteTo=None, castle=NO_CASTLING
     ) -> None:
         self.start_square = start_square
         self.end_square = end_square

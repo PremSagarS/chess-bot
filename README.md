@@ -6,8 +6,8 @@ To-Do:
 Move Class [x]
 
 ChessGameState Class []
-- Data []
-- from_fen []
+- Data [x]
+- set_to_fen [x]
 - make_move []
 - pseudo_legal_moves_for []
 - legal_moves_for []

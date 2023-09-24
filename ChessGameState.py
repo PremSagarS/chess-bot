@@ -61,9 +61,21 @@ class ChessGameState:
                     continue
                 endSquarePiece = self.chessboard[end_square_idx]
                 if endSquarePiece == EMPTY and moveRange == 1:
-                    possibleMoves.append(
-                        Move(start_square_idx, end_square_idx, startSquarePiece)
-                    )
+                    if end_square_idx // 8 == PAWN_PROMOTION_RANK[self.to_move]:
+                        for piece in PROMOTETO_PIECES:
+                            possibleMoves.append(
+                                Move(
+                                    start_square_idx,
+                                    end_square_idx,
+                                    startSquarePiece,
+                                    self.to_move | piece,
+                                    NO_CASTLING,
+                                )
+                            )
+                    else:
+                        possibleMoves.append(
+                            Move(start_square_idx, end_square_idx, startSquarePiece)
+                        )
                 elif (
                     moveRange == 2
                     and endSquarePiece == EMPTY
@@ -89,9 +101,21 @@ class ChessGameState:
                 if (
                     endSquarePiece == EMPTY and self.en_passant_square == end_square_idx
                 ) or (endSquarePiece != EMPTY and endSquarePieceColor != self.to_move):
-                    possibleMoves.append(
-                        Move(start_square_idx, end_square_idx, startSquarePiece)
-                    )
+                    if end_square_idx // 8 == PAWN_PROMOTION_RANK[self.to_move]:
+                        for piece in PROMOTETO_PIECES:
+                            possibleMoves.append(
+                                Move(
+                                    start_square_idx,
+                                    end_square_idx,
+                                    startSquarePiece,
+                                    self.to_move | piece,
+                                    NO_CASTLING,
+                                )
+                            )
+                    else:
+                        possibleMoves.append(
+                            Move(start_square_idx, end_square_idx, startSquarePiece)
+                        )
 
             return possibleMoves
 
@@ -278,5 +302,5 @@ class ChessGameState:
 
 
 c = ChessGameState()
-c.set_to_fen("rn1qkb1r/pp2pppp/5n2/2pp1b2/3P1B2/2P5/PP1NPPPP/R2QKBNR w KQkq - 3 5")
-print(c.generate_pseudo_legal_moves_for(square_to_idx("e1")))
+c.set_to_fen("r2qkb1r/1P1npppp/p4n2/3p1b2/5B2/2P5/PP1NPPPP/R2QKBNR w KQkq - 1 8")
+print(c.generate_pseudo_legal_moves_for(square_to_idx("b7")))

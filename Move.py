@@ -20,4 +20,7 @@ class Move:
         start_square = idx_to_square(self.start_square)
         end_square = idx_to_square(self.end_square)
         piece = PIECE_TO_TEXT[self.piece]
-        return f"{piece} {start_square} {end_square}"
+        return_string = f"{piece} {start_square} {end_square}"
+        if self.promoteTo:
+            return_string = f"{return_string} {PIECE_TO_TEXT[self.promoteTo]}"
+        return return_string

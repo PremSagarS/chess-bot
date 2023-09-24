@@ -246,7 +246,6 @@ class ChessGameState:
 
 
 c = ChessGameState()
-c.print_board()
 c.set_to_fen("rnbqkbnr/p1pp1ppp/4p3/1p1P4/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")
 c.display_board(c.board_to_fen())
 print(c.board_to_fen())

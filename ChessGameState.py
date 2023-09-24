@@ -12,9 +12,8 @@ class ChessGameState:
         self.castling_rights = []
         self.en_passant_square = None
         self.moves = []
-        self.pieces = [[] for i in range(23)]
+        self.pieces = []
         self.set_to_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-        self.gen_pieces()
         self.numsquarestoedge = [[] for i in range(64)]
         self.precomputemovedata()
 
@@ -229,6 +228,7 @@ class ChessGameState:
             self.en_passant_square = square_to_idx(passant)
         self.draw_move_counter = draw
         self.move_counter = move_no
+        self.gen_pieces()
 
     def board_to_fen(self):
         op = ""
@@ -296,6 +296,7 @@ class ChessGameState:
             display.update(fen, game_board)
 
     def gen_pieces(self):
+        self.pieces = [[] for i in range(23)]
         for i in range(64):
             piece = self.chessboard[i]
             self.pieces[piece].append(i)
@@ -304,3 +305,4 @@ class ChessGameState:
 c = ChessGameState()
 c.set_to_fen("r2qkb1r/1P1npppp/p4n2/3p1b2/5B2/2P5/PP1NPPPP/R2QKBNR w KQkq - 1 8")
 print(c.generate_pseudo_legal_moves_for(square_to_idx("b7")))
+print(c.pieces)

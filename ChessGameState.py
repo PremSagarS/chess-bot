@@ -51,7 +51,21 @@ class ChessGameState:
 
         possibleMoves = []
 
-        for directionIndex in range(8):
+        directionIndexStart = directionIndexEnd = None
+
+        if startSquarePieceType == BISHOP:
+            directionIndexStart = 4
+            directionIndexEnd = 7
+
+        elif startSquarePieceType == ROOK:
+            directionIndexStart = 0
+            directionIndexEnd = 3
+
+        elif startSquarePieceType == QUEEN:
+            directionIndexStart = 0
+            directionIndexEnd = 7
+
+        for directionIndex in range(directionIndexStart, directionIndexEnd + 1):
             for n in range(
                 1, self.numsquarestoedge[start_square_idx][directionIndex] + 1
             ):
@@ -130,6 +144,6 @@ class ChessGameState:
 
 c = ChessGameState()
 c.print_board()
-c.set_to_fen("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
+c.set_to_fen("rnbqkbnr/ppp3pp/8/3p1p2/3pPP1P/8/PPP3P1/RNBQKBNR w KQkq - 0 5")
 c.print_board()
-print(c.generate_pseudo_legal_moves_for(square_to_idx("d1")))
+print(c.generate_pseudo_legal_moves_for(square_to_idx("h1")))

@@ -11,14 +11,10 @@ class ChessGameState:
         self.castling_rights = []
         self.en_passant_square = None
         self.moves = []
-        self.pieces = [] * 23
+        self.pieces = [[] for i in range(23)]
         self.set_to_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-        for i in range(23):
-            self.pieces.append([])
         self.gen_pieces()
-        self.numsquarestoedge = []
-        for i in range(64):
-            self.numsquarestoedge.append([])
+        self.numsquarestoedge = [[] for i in range(64)]
         self.precomputemovedata()
 
     def precomputemovedata(self):
@@ -52,6 +48,24 @@ class ChessGameState:
         possibleMoves = []
 
         directionIndexStart = directionIndexEnd = None
+
+        if startSquarePieceType == KING:
+            for directionidx in range(8):
+                end_square_idx = start_square_idx + DIRECTIONOFFSETS[directionidx]
+                if end_square_idx < 0 or end_square_idx > 63:
+                    continue
+                endSquarePiece = self.chessboard[end_square_idx]
+                endSquarePieceColor = endSquarePiece & 0b11000
+
+                if endSquarePiece == EMPTY or endSquarePieceColor != self.to_move:
+                    possibleMoves.append(
+                        Move(start_square_idx, end_square_idx, startSquarePiece)
+                    )
+
+                else:
+                    continue
+
+            return possibleMoves
 
         if startSquarePieceType == BISHOP:
             directionIndexStart = 4
@@ -144,6 +158,6 @@ class ChessGameState:
 
 c = ChessGameState()
 c.print_board()
-c.set_to_fen("rnbqkbnr/ppp3pp/8/3p1p2/3pPP1P/8/PPP3P1/RNBQKBNR w KQkq - 0 5")
+c.set_to_fen("rnbq1bnr/ppp1k1pp/8/3p1p2/3pPP1P/8/PPP1K1P1/RNBQ1BNR w - - 2 6")
 c.print_board()
-print(c.generate_pseudo_legal_moves_for(square_to_idx("h1")))
+print(c.generate_pseudo_legal_moves_for(square_to_idx("e2")))

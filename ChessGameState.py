@@ -111,6 +111,38 @@ class ChessGameState:
                 else:
                     continue
 
+            # Castling:
+            if start_square_idx == KING_START_INDEX[self.to_move]:
+                if self.castling_rights[KINGSIDE_CASTLING[self.to_move]]:
+                    castling_squares_empty = True
+                    for square_idx in KINGSIDE_CASTLING_SQUARES[self.to_move]:
+                        castling_squares_empty &= self.chessboard[square_idx] == EMPTY
+                    if castling_squares_empty:
+                        possibleMoves.append(
+                            Move(
+                                start_square_idx,
+                                KINGSIDE_CASTLING_ENDSQUARE[self.to_move],
+                                startSquarePiece,
+                                None,
+                                KINGSIDE_CASTLING[self.to_move],
+                            )
+                        )
+
+                if self.castling_rights[QUEENSIDE_CASTLING[self.to_move]]:
+                    castling_squares_empty = True
+                    for square_idx in QUEENSIDE_CASTLING_SQUARES[self.to_move]:
+                        castling_squares_empty &= self.chessboard[square_idx] == EMPTY
+                    if castling_squares_empty:
+                        possibleMoves.append(
+                            Move(
+                                start_square_idx,
+                                QUEENSIDE_CASTLING_ENDSQUARE[self.to_move],
+                                startSquarePiece,
+                                None,
+                                QUEENSIDE_CASTLING[self.to_move],
+                            )
+                        )
+
             return possibleMoves
 
         if startSquarePieceType == BISHOP:
@@ -246,6 +278,5 @@ class ChessGameState:
 
 
 c = ChessGameState()
-c.set_to_fen("rnbqkbnr/p1pp1ppp/4p3/1p1P4/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")
-c.display_board(c.board_to_fen())
-print(c.board_to_fen())
+c.set_to_fen("rn1qkb1r/pp2pppp/5n2/2pp1b2/3P1B2/2P5/PP1NPPPP/R2QKBNR w KQkq - 3 5")
+print(c.generate_pseudo_legal_moves_for(square_to_idx("e1")))

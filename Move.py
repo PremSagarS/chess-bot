@@ -12,6 +12,11 @@ class Move:
         self.castle = castle
 
     def __repr__(self) -> str:
+        if self.castle != NO_CASTLING:
+            if self.castle in [KINGSIDE_CASTLING[BLACK], KINGSIDE_CASTLING[WHITE]]:
+                return "O-O"
+            else:
+                return "O-O-O"
         start_square = idx_to_square(self.start_square)
         end_square = idx_to_square(self.end_square)
         piece = PIECE_TO_TEXT[self.piece]

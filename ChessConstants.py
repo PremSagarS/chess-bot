@@ -34,7 +34,6 @@ IDX_TO_FILES = {v: k for k, v in FILES_TO_IDX.items()}
 IDX_TO_RANKS = {v: k for k, v in RANKS_TO_IDX.items()}
 
 DIRECTIONOFFSETS = [-8, 8, 1, -1, -7, -9, 9, 7]
-KNIGHT_OFFSETS = [-15, -17, -6, 10, 17, 15, -10, 6]
 
 
 def square_to_idx(square):

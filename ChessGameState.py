@@ -50,16 +50,26 @@ class ChessGameState:
         directionIndexStart = directionIndexEnd = None
 
         if startSquarePieceType == KNIGHT:
-            for offset_idx in range(8):
-                end_square_idx = start_square_idx + KNIGHT_OFFSETS[offset_idx]
-                if end_square_idx < 0 or end_square_idx > 63:
-                    continue
-                endSquarePiece = self.chessboard[end_square_idx]
-                endSquarePieceColor = endSquarePiece & 0b11000
-                if endSquarePiece == EMPTY or endSquarePieceColor != self.to_move:
-                    possibleMoves.append(
-                        Move(start_square_idx, end_square_idx, startSquarePiece)
-                    )
+            possibleOffsetValues = [(1, 2), (2, 1)]
+            possibleOffsetSigns = [(-1, 1), (-1, -1), (1, 1), (1, -1)]
+            startRank = start_square_idx // 8
+            startFile = start_square_idx % 8
+            for offsetvalues in possibleOffsetValues:
+                for offsetsigns in possibleOffsetSigns:
+                    fileOffset = offsetvalues[0] * offsetsigns[0]
+                    rankOffset = offsetvalues[1] * offsetsigns[1]
+                    endRank = startRank + rankOffset
+                    endFile = startFile + fileOffset
+                    end_square_idx = endRank * 8 + endFile
+                    if endRank < 0 or endRank > 7 or endFile < 0 or endFile > 7:
+                        continue
+                    endSquarePiece = self.chessboard[end_square_idx]
+                    endSquarePieceColor = endSquarePiece & 0b11000
+                    if endSquarePiece == EMPTY or endSquarePieceColor != self.to_move:
+                        possibleMoves.append(
+                            Move(start_square_idx, end_square_idx, startSquarePiece)
+                        )
+
             return possibleMoves
 
         if startSquarePieceType == PAWN:
@@ -134,7 +144,7 @@ class ChessGameState:
         if startSquarePieceType == KING:
             for directionidx in range(8):
                 end_square_idx = start_square_idx + DIRECTIONOFFSETS[directionidx]
-                if end_square_idx < 0 or end_square_idx > 63:
+                if self.numsquarestoedge[start_square_idx][directionidx] < 1:
                     continue
                 endSquarePiece = self.chessboard[end_square_idx]
                 endSquarePieceColor = endSquarePiece & 0b11000
@@ -325,4 +335,5 @@ class ChessGameState:
 
 
 c = ChessGameState()
-print(len(c.generate_pseudo_legal_moves()))
+c.set_to_fen("rnb1k2r/p3n1bp/8/4ppp1/2pP1B2/Kp1QP3/PPP2PPP/R4BNR w kq - 0 14")
+print((c.generate_pseudo_legal_moves_for(square_to_idx("a3"))))

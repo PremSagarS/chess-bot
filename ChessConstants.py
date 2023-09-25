@@ -1,3 +1,15 @@
+from random import randint
+
+
+def randomZobristKey():
+    return randint(0, pow(2, 64))
+
+
+def generateZobristKeys():
+    Table = [[randomZobristKey() for piece_idx in range(23)] for board_idx in range(64)]
+    return Table
+
+
 EMPTY = 0b00000
 WHITE = 0b01000
 BLACK = 0b10000

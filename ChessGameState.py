@@ -16,6 +16,7 @@ class ChessGameState:
         self.set_to_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
         self.numsquarestoedge = [[] for i in range(64)]
         self.precomputemovedata()
+        self.zobristKeys = generateZobristKeys()
 
     def precomputemovedata(self):
         for rank in range(8):
@@ -273,6 +274,14 @@ class ChessGameState:
     def make_move(self, move):
         pass
 
+    def boardToZobristKey(self):
+        h = 0
+        for board_idx in range(63):
+            piece = self.chessboard[board_idx]
+            if piece != EMPTY:
+                h ^= self.zobristKeys[board_idx][piece]
+        return h
+
     def set_to_fen(self, fen):
         position, to_move, castling, passant, draw, move_no = fen.split(" ")
         index = 0
@@ -377,5 +386,10 @@ class ChessGameState:
 
 
 c = ChessGameState()
+print(c.boardToZobristKey())
 c.set_to_fen("rnb1k2r/p3n1bp/8/4ppp1/2pP1B2/Kp1QP3/PPP2PPP/R4BNR w kq - 0 14")
-print((c.generate_pseudo_legal_moves_for(square_to_idx("a3"))))
+print(c.boardToZobristKey())
+c.set_to_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+print(c.boardToZobristKey())
+c.set_to_fen("rnb1k2r/p3n1bp/8/4ppp1/2pP1B2/Kp1QP3/PPP2PPP/R4BNR w kq - 0 14")
+print(c.boardToZobristKey())

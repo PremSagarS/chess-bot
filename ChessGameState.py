@@ -7,10 +7,13 @@ class ChessGameState:
     def __init__(self):
         self.chessboard = [0] * 64
         self.draw_move_counter = 0
+        self.drawMoveCounterOn = []
         self.move_counter = 1
         self.reachedPositions = dict()
         self.castling_rights = []
+        self.castlingRightsOn = []
         self.en_passant_square = None
+        self.enPassantSquareOn = []
         self.moves = []
         self.pieces = []
         self.set_to_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -276,14 +279,6 @@ class ChessGameState:
         self.chessboard[move.start_square] = EMPTY
         self.chessboard[move.end_square] = move.piece
 
-        # update draw move counter
-        if move.piece & 0b00111 != PAWN and move.captured_piece == EMPTY:
-            self.draw_move_counter += 1
-
-        # update move counter
-        if move.piece & 0b11000 == BLACK:
-            self.move_counter += 1
-
         # update pieces
         self.pieces[move.captured_piece].remove(move.end_square)
         self.pieces[move.piece].remove(move.start_square)
@@ -296,6 +291,7 @@ class ChessGameState:
         )
 
         # update castling rights
+        self.castlingRightsOn.append(self.castling_rights)
         if self.castling_rights[KINGSIDE_CASTLING[BLACK]]:
             if move.start_square == 7 or move.end_square == 7:
                 self.castling_rights[KINGSIDE_CASTLING[BLACK]] = False
@@ -313,6 +309,7 @@ class ChessGameState:
                 self.castling_rights[QUEENSIDE_CASTLING[WHITE]] = False
 
         # update en passant square
+        self.enPassantSquareOn.append(self.en_passant_square)
         if move.piece & 0b00111 == PAWN:
             startSquareRank = move.start_square // 8
             endSquareRank = move.end_square // 8
@@ -326,8 +323,49 @@ class ChessGameState:
         else:
             self.en_passant_square = None
 
+        # update draw move counter
+        self.drawMoveCounterOn.append(self.draw_move_counter)
+        if move.piece & 0b00111 != PAWN and move.captured_piece == EMPTY:
+            self.draw_move_counter += 1
+        else:
+            self.draw_move_counter = 0
+
+        # update move counter
+        if move.piece & 0b11000 == BLACK:
+            self.move_counter += 1
+
         # update moves
         self.moves.append(move)
+
+    def unmake_move(self):
+        # update moves
+        move = self.moves.pop()
+
+        # update reahchedPositions
+        zobristHash = self.boardToZobristKey()
+        self.reachedPositions[zobristHash] -= 1
+
+        # update board
+        self.chessboard[move.start_square] = move.piece
+        self.chessboard[move.end_square] = move.captured_piece
+
+        # update pieces
+        self.pieces[move.captured_piece].append(move.end_square)
+        self.pieces[move.piece].append(move.start_square)
+        self.pieces[move.piece].remove(move.end_square)
+
+        # update en passant square
+        self.en_passant_square = self.enPassantSquareOn.pop()
+
+        # update casling rights
+        self.castling_rights = self.castlingRightsOn.pop()
+
+        # update move counter
+        if move.piece & 0b11000 == BLACK:
+            self.move_counter -= 1
+
+        # update draw move counter
+        self.draw_move_counter = self.drawMoveCounterOn.pop()
 
     def boardToZobristKey(self):
         h = 0
@@ -442,4 +480,6 @@ class ChessGameState:
 
 c = ChessGameState()
 c.make_move(Move(48, 32, WHITE | PAWN))
-print(c.board_to_fen())
+c.print_board()
+c.unmake_move()
+c.print_board()

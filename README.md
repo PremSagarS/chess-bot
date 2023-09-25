@@ -16,8 +16,8 @@ ChessGameState Class []
 - [x] gen_pieces => Updates the current list of pieces and their indices
 - [x] generate_pseudo_legal_moves_for => List of Move objects
 - [x] generate_pseudo_legal_moves => List of move objects
-- [ ] legal_moves_for
+- [x] legal_moves_for
 - [ ] is_game_over
-- [ ] player_to_move
+- [x] player_to_move
 - [x] unmake_last_move
 - [x] is_it_illegal() => true/false. returns true if you can capture opponent's king

@@ -367,6 +367,14 @@ class ChessGameState:
         # update draw move counter
         self.draw_move_counter = self.drawMoveCounterOn.pop()
 
+    def is_it_illegal(self):
+        plmoves = self.generate_pseudo_legal_moves()
+        for plmove in plmoves:
+            if plmove.captured_piece & 0b00111 == KING:
+                return True
+
+        return False
+
     def boardToZobristKey(self):
         h = 0
         for board_idx in range(63):
@@ -479,3 +487,6 @@ class ChessGameState:
 
 
 c = ChessGameState()
+c.set_to_fen("8/8/8/4k3/8/2P5/8/8 w - - 0 1")
+print(c.generate_pseudo_legal_moves())
+print(c.is_it_illegal())

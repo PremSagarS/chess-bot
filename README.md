@@ -20,4 +20,4 @@ ChessGameState Class []
 - [ ] is_game_over
 - [ ] player_to_move
 - [x] unmake_last_move
-- [ ] is_it_check
+- [x] is_it_illegal() => true/false. returns true if you can capture opponent's king

@@ -283,7 +283,7 @@ class ChessGameState:
         lmoves = []
         for plmove in plmoves:
             self.make_move(plmove)
-            if self.is_it_illegal == False:
+            if self.is_it_illegal() == False:
                 lmoves.append(plmove)
             self.unmake_last_move()
         return lmoves
@@ -708,6 +708,8 @@ class ChessGameState:
 
 
 c = ChessGameState()
-c.set_to_fen("rnbqk1nr/1pp2ppp/4p3/p2pP3/1b1P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 5")
-print(c.generate_pseudo_legal_moves_for(square_to_idx("c3")))
-print(c.generate_legal_moves_for(square_to_idx("c3")))
+c.set_to_fen("8/2p5/3p4/KP5r/1R3p1k/4P3/6P1/8 w - - 0 1")
+c.make_move(Move(square_to_idx("e3"), square_to_idx("e4"), WHITE | PAWN))
+c.make_move(Move(square_to_idx("c7"), square_to_idx("c5"), BLACK | PAWN))
+print(c.generate_pseudo_legal_moves_for(square_to_idx("b5")))
+print(c.generate_legal_moves_for(square_to_idx("b5")))

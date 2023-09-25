@@ -67,7 +67,12 @@ class ChessGameState:
                     endSquarePieceColor = endSquarePiece & 0b11000
                     if endSquarePiece == EMPTY or endSquarePieceColor != self.to_move:
                         possibleMoves.append(
-                            Move(start_square_idx, end_square_idx, startSquarePiece)
+                            Move(
+                                start_square_idx,
+                                end_square_idx,
+                                startSquarePiece,
+                                captured_piece=endSquarePiece,
+                            )
                         )
 
             return possibleMoves
@@ -92,11 +97,17 @@ class ChessGameState:
                                     startSquarePiece,
                                     self.to_move | piece,
                                     NO_CASTLING,
+                                    endSquarePiece,
                                 )
                             )
                     else:
                         possibleMoves.append(
-                            Move(start_square_idx, end_square_idx, startSquarePiece)
+                            Move(
+                                start_square_idx,
+                                end_square_idx,
+                                startSquarePiece,
+                                captured_piece=endSquarePiece,
+                            )
                         )
                 elif (
                     moveRange == 2
@@ -109,7 +120,12 @@ class ChessGameState:
                     moveOnceEndSquarePiece = self.chessboard[moveOnceEndSquareIndex]
                     if moveOnceEndSquarePiece == EMPTY:
                         possibleMoves.append(
-                            Move(start_square_idx, end_square_idx, startSquarePiece)
+                            Move(
+                                start_square_idx,
+                                end_square_idx,
+                                startSquarePiece,
+                                captured_piece=endSquarePiece,
+                            )
                         )
 
             # Captures:
@@ -132,11 +148,17 @@ class ChessGameState:
                                     startSquarePiece,
                                     self.to_move | piece,
                                     NO_CASTLING,
+                                    endSquarePiece,
                                 )
                             )
                     else:
                         possibleMoves.append(
-                            Move(start_square_idx, end_square_idx, startSquarePiece)
+                            Move(
+                                start_square_idx,
+                                end_square_idx,
+                                startSquarePiece,
+                                captured_piece=endSquarePiece,
+                            )
                         )
 
             return possibleMoves
@@ -151,7 +173,12 @@ class ChessGameState:
 
                 if endSquarePiece == EMPTY or endSquarePieceColor != self.to_move:
                     possibleMoves.append(
-                        Move(start_square_idx, end_square_idx, startSquarePiece)
+                        Move(
+                            start_square_idx,
+                            end_square_idx,
+                            startSquarePiece,
+                            captured_piece=endSquarePiece,
+                        )
                     )
 
                 else:
@@ -171,6 +198,7 @@ class ChessGameState:
                                 startSquarePiece,
                                 None,
                                 KINGSIDE_CASTLING[self.to_move],
+                                endSquarePiece,
                             )
                         )
 
@@ -186,6 +214,7 @@ class ChessGameState:
                                 startSquarePiece,
                                 None,
                                 QUEENSIDE_CASTLING[self.to_move],
+                                endSquarePiece,
                             )
                         )
 
@@ -212,13 +241,23 @@ class ChessGameState:
                 endSquarePieceColor = endSquarePiece & 0b11000
                 if endSquarePiece == EMPTY:
                     possibleMoves.append(
-                        Move(start_square_idx, end_square_idx, startSquarePiece)
+                        Move(
+                            start_square_idx,
+                            end_square_idx,
+                            startSquarePiece,
+                            captured_piece=endSquarePiece,
+                        )
                     )
                 elif endSquarePieceColor == self.to_move:
                     break
                 else:
                     possibleMoves.append(
-                        Move(start_square_idx, end_square_idx, startSquarePiece)
+                        Move(
+                            start_square_idx,
+                            end_square_idx,
+                            startSquarePiece,
+                            captured_piece=endSquarePiece,
+                        )
                     )
         return possibleMoves
 
@@ -230,6 +269,9 @@ class ChessGameState:
                     self.generate_pseudo_legal_moves_for(square_index)
                 )
         return possible_moves
+
+    def make_move(self, move):
+        pass
 
     def set_to_fen(self, fen):
         position, to_move, castling, passant, draw, move_no = fen.split(" ")

@@ -282,10 +282,37 @@ class ChessGameState:
         plmoves = self.generate_pseudo_legal_moves_for(square_idx)
         lmoves = []
         for plmove in plmoves:
-            self.make_move(plmove)
-            if self.is_it_illegal() == False:
-                lmoves.append(plmove)
-            self.unmake_last_move()
+            if plmove.castle == NO_CASTLING:
+                self.make_move(plmove)
+                if self.is_it_illegal() == False:
+                    lmoves.append(plmove)
+                self.unmake_last_move()
+            else:
+                movingPiece = plmove.piece
+                movingPieceColor = movingPiece & 0b11000
+                movingPieceType = movingPiece & 0b00111
+                if plmove.castle == KINGSIDE_CASTLING[movingPieceColor]:
+                    squares_to_check = (
+                        [KING_START_INDEX[movingPieceColor]]
+                        + KINGSIDE_CASTLING_SQUARES[movingPieceColor]
+                        + [KINGSIDE_CASTLING_ENDSQUARE[movingPieceColor]]
+                    )
+                elif plmove.castle == QUEENSIDE_CASTLING[movingPieceColor]:
+                    squares_to_check = (
+                        [KING_START_INDEX[movingPieceColor]]
+                        + KINGSIDE_CASTLING_SQUARES[movingPieceColor]
+                        + [KINGSIDE_CASTLING_ENDSQUARE[movingPieceColor]]
+                    )
+                moveIsLegal = True
+                self.make_move(plmove)
+                new_plmoves = self.generate_pseudo_legal_moves()
+                for new_plmove in new_plmoves:
+                    if new_plmove.end_square in squares_to_check:
+                        moveIsLegal = False
+                        break
+                if moveIsLegal:
+                    lmoves.append(plmove)
+
         return lmoves
 
     def make_enpassant_move(self, move):
@@ -705,11 +732,3 @@ class ChessGameState:
         for i in range(64):
             piece = self.chessboard[i]
             self.pieces[piece].append(i)
-
-
-c = ChessGameState()
-c.set_to_fen("8/2p5/3p4/KP5r/1R3p1k/4P3/6P1/8 w - - 0 1")
-c.make_move(Move(square_to_idx("e3"), square_to_idx("e4"), WHITE | PAWN))
-c.make_move(Move(square_to_idx("c7"), square_to_idx("c5"), BLACK | PAWN))
-print(c.generate_pseudo_legal_moves_for(square_to_idx("b5")))
-print(c.generate_legal_moves_for(square_to_idx("b5")))

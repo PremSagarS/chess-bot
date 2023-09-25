@@ -19,5 +19,5 @@ ChessGameState Class []
 - [ ] legal_moves_for
 - [ ] is_game_over
 - [ ] player_to_move
-- [ ] unmake_last_move
+- [x] unmake_last_move
 - [ ] is_it_check

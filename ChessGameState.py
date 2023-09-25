@@ -337,7 +337,7 @@ class ChessGameState:
         # update moves
         self.moves.append(move)
 
-    def unmake_move(self):
+    def unmake_last_move(self):
         # update moves
         move = self.moves.pop()
 
@@ -479,7 +479,3 @@ class ChessGameState:
 
 
 c = ChessGameState()
-c.make_move(Move(48, 32, WHITE | PAWN))
-c.print_board()
-c.unmake_move()
-c.print_board()

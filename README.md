@@ -10,7 +10,7 @@ ChessGameState Class []
 - [x] set_to_fen(fen) => sets board state to fen and returns none
 - [x] board_to_fen(void) => returns current board state as fen string
 - [x] precomputemovedata(void) => computes the number of squares to edge in every direction for all squares
-- [ ] make_move
+- [x] make_move
 - [x] print_board(void) => void
 - [x] display_board(fen string) => void
 - [x] gen_pieces => Updates the current list of pieces and their indices

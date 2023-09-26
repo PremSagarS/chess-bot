@@ -497,6 +497,57 @@ class ChessGameState:
         # update draw move counter
         self.draw_move_counter = self.drawMoveCounterOn.pop()
 
+    def make_promoting_move(self, move):
+        # update board
+        self.chessboard[move.start_square] = EMPTY
+        self.chessboard[move.end_square] = move.promoteTo
+
+        # update pieces
+        self.pieces[move.piece].remove(move.start_square)
+        self.pieces[EMPTY].append(move.start_square)
+        self.pieces[move.promoteTo].append(move.end_square)
+        self.pieces[EMPTY].remove(move.end_square)
+
+        # update reachedPositions
+        zobristHash = self.boardToZobristKey()
+        self.reachedPositions[zobristHash] = (
+            self.reachedPositions.get(zobristHash, 0) + 1
+        )
+
+        self.castlingRightsOn.append(self.castling_rights)
+
+        self.enPassantSquareOn.append(self.en_passant_square)
+        self.en_passant_square = None
+
+        self.drawMoveCounterOn.append(self.draw_move_counter)
+        self.draw_move_counter = 0
+
+        if move.piece & 0b11000 == BLACK:
+            self.move_counter += 1
+
+        self.moves.append(move)
+
+    def unmake_promoting_move(self, move):
+        zobristHash = self.boardToZobristKey()
+        self.reachedPositions[zobristHash] -= 1
+
+        self.chessboard[move.start_square] = move.piece
+        self.chessboard[move.end_square] = EMPTY
+
+        self.pieces[move.piece].append(move.start_square)
+        self.pieces[EMPTY].remove(move.start_square)
+        self.pieces[move.promoteTo].remove(move.end_square)
+        self.pieces[EMPTY].append(move.end_square)
+
+        self.en_passant_square = self.enPassantSquareOn.pop()
+
+        self.castling_rights = self.castlingRightsOn.pop()
+
+        if move.piece & 0b11000 == BLACK:
+            self.move_counter -= 1
+
+        self.draw_move_counter = self.drawMoveCounterOn.pop()
+
     def make_move(self, move):
         self.to_move = BLACK + WHITE - self.to_move
 
@@ -506,6 +557,10 @@ class ChessGameState:
 
         if move.end_square == self.en_passant_square and move.piece & 0b00111 == PAWN:
             self.make_enpassant_move(move)
+            return
+
+        if move.promoteTo != EMPTY:
+            self.make_promoting_move(move)
             return
 
         # update board
@@ -586,6 +641,10 @@ class ChessGameState:
             and move.piece & 0b00111 == PAWN
         ):
             self.unmake_enpassant_move(move)
+            return
+
+        if move.promoteTo != EMPTY:
+            self.unmake_promoting_move(move)
             return
 
         # update reahchedPositions

@@ -42,6 +42,108 @@ class ChessGameState:
                     min(southMax, westMax),
                 ]
 
+    def attacking_squares_of(self, start_square_idx):
+        startSquarePiece = self.chessboard[start_square_idx]
+        startSquarePieceType = startSquarePiece & 0b00111
+        startSquarePieceColor = startSquarePiece & 0b11000
+
+        attacking_squares = []
+
+        if startSquarePieceType == KING:
+            for directionIndex in range(8):
+                if self.numsquarestoedge[start_square_idx][directionIndex] < 1:
+                    continue
+                end_square_idx = start_square_idx + DIRECTIONOFFSETS[directionIndex]
+                endSquarePiece = self.chessboard[end_square_idx]
+                endSquarePieceColor = endSquarePiece & 0b11000
+                if endSquarePiece == EMPTY or endSquarePiece != startSquarePieceColor:
+                    attacking_squares.append(end_square_idx)
+            return attacking_squares
+
+        if startSquarePieceType == KNIGHT:
+            possibleOffsetValues = [(1, 2), (2, 1)]
+            possibleOffsetSigns = [(-1, 1), (-1, -1), (1, 1), (1, -1)]
+            startRank = start_square_idx // 8
+            startFile = start_square_idx % 8
+            for offsetvalues in possibleOffsetValues:
+                for offsetsigns in possibleOffsetSigns:
+                    fileOffset = offsetvalues[0] * offsetsigns[0]
+                    rankOffset = offsetvalues[1] * offsetsigns[1]
+                    endRank = startRank + rankOffset
+                    endFile = startFile + fileOffset
+                    end_square_idx = endRank * 8 + endFile
+                    if endRank < 0 or endRank > 7 or endFile < 0 or endFile > 7:
+                        continue
+                    endSquarePiece = self.chessboard[end_square_idx]
+                    endSquarePieceColor = endSquarePiece & 0b11000
+                    if (
+                        endSquarePiece == EMPTY
+                        or endSquarePieceColor != startSquarePiece
+                    ):
+                        attacking_squares.append(end_square_idx)
+            return attacking_squares
+
+        if startSquarePieceType == PAWN:
+            for direction_idx in range(2):
+                directionIndex = PAWN_TAKES_DIRECTION_OFFSET[startSquarePieceColor][
+                    direction_idx
+                ]
+                if self.numsquarestoedge[start_square_idx][directionIndex] < 1:
+                    continue
+                end_square_idx = start_square_idx + DIRECTIONOFFSETS[directionIndex]
+                endSquarePiece = self.chessboard[end_square_idx]
+                endSquarePieceColor = endSquarePiece & 0b11000
+                if (
+                    endSquarePiece == EMPTY
+                    or endSquarePieceColor != startSquarePieceColor
+                ):
+                    attacking_squares.append(end_square_idx)
+            return attacking_squares
+
+        directionIndexStart = directionIndexEnd = None
+
+        if startSquarePieceType == BISHOP:
+            directionIndexStart = 4
+            directionIndexEnd = 7
+
+        elif startSquarePieceType == ROOK:
+            directionIndexStart = 0
+            directionIndexEnd = 3
+
+        elif startSquarePieceType == QUEEN:
+            directionIndexStart = 0
+            directionIndexEnd = 7
+
+        for directionIndex in range(directionIndexStart, directionIndexEnd + 1):
+            for n in range(
+                1, self.numsquarestoedge[start_square_idx][directionIndex] + 1
+            ):
+                end_square_idx = start_square_idx + DIRECTIONOFFSETS[directionIndex] * n
+                endSquarePiece = self.chessboard[end_square_idx]
+                endSquarePieceColor = endSquarePiece & 0b11000
+                if endSquarePiece == EMPTY:
+                    attacking_squares.append(end_square_idx)
+                elif endSquarePieceColor != startSquarePieceColor:
+                    attacking_squares.append(end_square_idx)
+                    break
+                else:
+                    break
+
+        return attacking_squares
+
+    def is_in_check(self):
+        kingSquare = self.pieces[self.to_move | KING][0]
+        for pieceSquares in self.pieces:
+            for square in pieceSquares:
+                pieceOnSquare = self.chessboard[square]
+                pieceOnSquareColor = pieceOnSquare & 0b11000
+                if pieceOnSquare == EMPTY or pieceOnSquareColor == self.to_move:
+                    continue
+                attackingSquares = self.attacking_squares_of(square)
+                if kingSquare in attackingSquares:
+                    return True
+        return False
+
     def generate_pseudo_legal_moves_for(self, start_square_idx):
         startSquarePiece = self.chessboard[start_square_idx]
         startSquarePieceType = startSquarePiece & 0b00111
@@ -134,10 +236,12 @@ class ChessGameState:
 
             # Captures:
             for direction_idx in range(2):
-                end_square_idx = (
-                    start_square_idx
-                    + PAWN_TAKES_DIRECTION_OFFSET[self.to_move][direction_idx]
-                )
+                directionIndex = PAWN_TAKES_DIRECTION_OFFSET[self.to_move][
+                    direction_idx
+                ]
+                if self.numsquarestoedge[start_square_idx][directionIndex] < 1:
+                    continue
+                end_square_idx = start_square_idx + DIRECTIONOFFSETS[directionIndex]
                 endSquarePiece = self.chessboard[end_square_idx]
                 endSquarePieceColor = endSquarePiece & 0b11000
                 if (
@@ -791,3 +895,8 @@ class ChessGameState:
         for i in range(64):
             piece = self.chessboard[i]
             self.pieces[piece].append(i)
+
+
+c = ChessGameState()
+c.set_to_fen("8/8/5k2/8/1pK1R3/8/8/8 w - - 0 1")
+print(c.is_in_check())

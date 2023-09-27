@@ -7,7 +7,7 @@ class Move:
         start_square,
         end_square,
         piece,
-        promoteTo=None,
+        promoteTo=EMPTY,
         castle=NO_CASTLING,
         captured_piece=EMPTY,
     ) -> None:

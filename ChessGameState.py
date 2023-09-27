@@ -371,6 +371,7 @@ class ChessGameState:
                             captured_piece=endSquarePiece,
                         )
                     )
+                    break
         return possibleMoves
 
     def generate_pseudo_legal_moves(self):
@@ -418,6 +419,13 @@ class ChessGameState:
                     lmoves.append(plmove)
 
         return lmoves
+
+    def generate_legal_moves(self):
+        possible_moves = []
+        for square_indices in self.pieces[1:]:
+            for square_index in square_indices:
+                possible_moves.extend(self.generate_legal_moves_for(square_index))
+        return possible_moves
 
     def make_enpassant_move(self, move):
         capturedRank = move.start_square // 8
@@ -896,7 +904,18 @@ class ChessGameState:
             piece = self.chessboard[i]
             self.pieces[piece].append(i)
 
+    def is_checkmate(self):
+        # Implement legal_moves and check if any move is available
+        if not self.is_in_check():
+            return False
+        kingSquare = self.pieces[self.to_move | KING][0]
+        if len(self.generate_legal_moves()) != 0:
+            return False
+        return True
+
 
 c = ChessGameState()
-c.set_to_fen("8/8/5k2/8/1pK1R3/8/8/8 w - - 0 1")
+c.set_to_fen("rr6/8/5k2/8/4R3/K7/8/8 w - - 0 1")
+print(c.generate_legal_moves())
 print(c.is_in_check())
+print(c.is_checkmate())

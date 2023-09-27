@@ -850,8 +850,8 @@ class ChessGameState:
                     op += str(buffer)
                     buffer = 0
                 op += "/"
-        if op[-1] == "/":
-            op += "8"
+        if buffer != 0:
+            op += str(buffer)
         if self.to_move == WHITE:
             op += " w"
         else:

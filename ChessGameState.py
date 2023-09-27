@@ -945,19 +945,3 @@ class ChessGameState:
             return EMPTY
         else:
             return None
-
-
-c = ChessGameState()
-c.make_move(Move(square_to_idx("e2"), square_to_idx("e4"), WHITE | PAWN))
-c.make_move(Move(square_to_idx("e7"), square_to_idx("e5"), BLACK | PAWN))
-
-c.make_move(Move(square_to_idx("e1"), square_to_idx("e2"), WHITE | KING))
-c.make_move(Move(square_to_idx("e8"), square_to_idx("e7"), BLACK | KING))
-c.make_move(Move(square_to_idx("e2"), square_to_idx("e1"), WHITE | KING))
-c.make_move(Move(square_to_idx("e7"), square_to_idx("e8"), BLACK | KING))
-
-c.make_move(Move(square_to_idx("e1"), square_to_idx("e2"), WHITE | KING))
-c.make_move(Move(square_to_idx("e8"), square_to_idx("e7"), BLACK | KING))
-c.make_move(Move(square_to_idx("e2"), square_to_idx("e1"), WHITE | KING))
-c.make_move(Move(square_to_idx("e7"), square_to_idx("e8"), BLACK | KING))
-print(c.is_game_over())

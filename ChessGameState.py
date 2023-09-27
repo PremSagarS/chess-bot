@@ -910,15 +910,54 @@ class ChessGameState:
         # Implement legal_moves and check if any move is available
         if not self.is_in_check():
             return False
-        kingSquare = self.pieces[self.to_move | KING][0]
         if len(self.generate_legal_moves()) != 0:
             return False
         return True
 
+    def is_stalemate(self):
+        if self.is_in_check():
+            return False
+        if len(self.generate_legal_moves()) != 0:
+            return False
+        return True
+
+    def is_draw_by_repetition(self):
+        for zobristHash in self.reachedPositions.keys():
+            if self.reachedPositions[zobristHash] > 2:
+                return True
+        return False
+
+    def is_draw_by_fifty_move(self):
+        return self.draw_move_counter >= 100
+
+    def is_draw(self):
+        return (
+            self.is_stalemate()
+            or self.is_draw_by_repetition()
+            or self.is_draw_by_fifty_move()
+        )
+
+    def is_game_over(self):
+        # returns winner if game over else returns False
+        if self.is_checkmate():
+            return BLACK + WHITE - self.to_move
+        elif self.is_draw():
+            return EMPTY
+        else:
+            return None
+
 
 c = ChessGameState()
-c.set_to_fen("1r6/8/r3k3/8/8/K7/8/8 w - - 0 3")
-print(c.generate_legal_moves())
-print(c.is_in_check())
-print(c.is_checkmate())
-print(c.board_to_fen())
+c.make_move(Move(square_to_idx("e2"), square_to_idx("e4"), WHITE | PAWN))
+c.make_move(Move(square_to_idx("e7"), square_to_idx("e5"), BLACK | PAWN))
+
+c.make_move(Move(square_to_idx("e1"), square_to_idx("e2"), WHITE | KING))
+c.make_move(Move(square_to_idx("e8"), square_to_idx("e7"), BLACK | KING))
+c.make_move(Move(square_to_idx("e2"), square_to_idx("e1"), WHITE | KING))
+c.make_move(Move(square_to_idx("e7"), square_to_idx("e8"), BLACK | KING))
+
+c.make_move(Move(square_to_idx("e1"), square_to_idx("e2"), WHITE | KING))
+c.make_move(Move(square_to_idx("e8"), square_to_idx("e7"), BLACK | KING))
+c.make_move(Move(square_to_idx("e2"), square_to_idx("e1"), WHITE | KING))
+c.make_move(Move(square_to_idx("e7"), square_to_idx("e8"), BLACK | KING))
+print(c.is_game_over())

@@ -850,6 +850,8 @@ class ChessGameState:
                     op += str(buffer)
                     buffer = 0
                 op += "/"
+        if op[-1] == "/":
+            op += "8"
         if self.to_move == WHITE:
             op += " w"
         else:
@@ -915,7 +917,8 @@ class ChessGameState:
 
 
 c = ChessGameState()
-c.set_to_fen("rr6/8/5k2/8/4R3/K7/8/8 w - - 0 1")
+c.set_to_fen("1r6/8/r3k3/8/8/K7/8/8 w - - 0 3")
 print(c.generate_legal_moves())
 print(c.is_in_check())
 print(c.is_checkmate())
+print(c.board_to_fen())

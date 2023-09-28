@@ -1,5 +1,5 @@
 # My test files
-local_testing.py
+local_*.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

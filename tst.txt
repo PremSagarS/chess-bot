@@ -1,0 +1,51 @@
+P d5 d6
+P d5 c6 Capturing p
+P d5 e6 Capturing p
+P a2 a3
+P a2 a4
+P b2 b3
+P c2 c3
+P c2 c4
+P g2 g3
+P g2 g4
+P g2 h3 Capturing p
+N e5 d3
+N e5 d7 Capturing p
+N e5 f7 Capturing p
+N e5 c4
+N e5 c6 Capturing p
+N e5 g4
+N e5 g6 Capturing p
+N b1 a3
+N b1 c3
+B d2 e3
+B d2 f4
+B d2 g5
+B d2 h6
+B d2 c3
+B d2 b4 Capturing p
+B d2 c1
+B e2 d3
+B e2 c4
+B e2 b5
+B e2 a6 Capturing b
+B e2 f1
+B e2 d1
+R h1 g1
+R h1 f1
+Q f3 f4
+Q f3 f5
+Q f3 f6 Capturing n
+Q f3 g3
+Q f3 h3 Capturing p
+Q f3 e3
+Q f3 d3
+Q f3 c3
+Q f3 b3
+Q f3 a3
+Q f3 g4
+Q f3 h5
+K e1 f1
+K e1 d1
+O-O
+O-O-O

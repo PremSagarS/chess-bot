@@ -316,7 +316,7 @@ class ChessGameState:
 
                 if self.castling_rights[QUEENSIDE_CASTLING[self.to_move]]:
                     castling_squares_empty = True
-                    for square_idx in QUEENSIDE_CASTLING_SQUARES[self.to_move]:
+                    for square_idx in QUEENSIDE_MUST_BE_EMPTY_SQUARES[self.to_move]:
                         castling_squares_empty &= self.chessboard[square_idx] == EMPTY
                     if castling_squares_empty:
                         possibleMoves.append(
@@ -405,8 +405,8 @@ class ChessGameState:
                 elif plmove.castle == QUEENSIDE_CASTLING[movingPieceColor]:
                     squares_to_check = (
                         [KING_START_INDEX[movingPieceColor]]
-                        + KINGSIDE_CASTLING_SQUARES[movingPieceColor]
-                        + [KINGSIDE_CASTLING_ENDSQUARE[movingPieceColor]]
+                        + QUEENSIDE_CASTLING_SQUARES[movingPieceColor]
+                        + [QUEENSIDE_CASTLING_ENDSQUARE[movingPieceColor]]
                     )
                 moveIsLegal = True
                 self.make_move(plmove)
@@ -417,14 +417,18 @@ class ChessGameState:
                         break
                 if moveIsLegal:
                     lmoves.append(plmove)
+                self.unmake_last_move()
 
         return lmoves
 
     def generate_legal_moves(self):
         possible_moves = []
-        for square_indices in self.pieces[1:]:
-            for square_index in square_indices:
-                possible_moves.extend(self.generate_legal_moves_for(square_index))
+        square_indices = []
+        for piece in self.pieces[1:]:
+            for square_index in piece:
+                square_indices.append(square_index)
+        for square_index in square_indices:
+            possible_moves.extend(self.generate_legal_moves_for(square_index))
         return possible_moves
 
     def make_enpassant_move(self, move):
@@ -618,7 +622,7 @@ class ChessGameState:
         self.pieces[move.piece].remove(move.start_square)
         self.pieces[EMPTY].append(move.start_square)
         self.pieces[move.promoteTo].append(move.end_square)
-        self.pieces[EMPTY].remove(move.end_square)
+        self.pieces[move.captured_piece].remove(move.end_square)
 
         # update reachedPositions
         zobristHash = self.boardToZobristKey()
@@ -644,12 +648,12 @@ class ChessGameState:
         self.reachedPositions[zobristHash] -= 1
 
         self.chessboard[move.start_square] = move.piece
-        self.chessboard[move.end_square] = EMPTY
+        self.chessboard[move.end_square] = move.captured_piece
 
         self.pieces[move.piece].append(move.start_square)
         self.pieces[EMPTY].remove(move.start_square)
         self.pieces[move.promoteTo].remove(move.end_square)
-        self.pieces[EMPTY].append(move.end_square)
+        self.pieces[move.captured_piece].append(move.end_square)
 
         self.en_passant_square = self.enPassantSquareOn.pop()
 
